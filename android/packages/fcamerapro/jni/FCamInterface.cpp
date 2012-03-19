@@ -657,11 +657,21 @@ static void *FCamAppThread(void *ptr) {
 	     * You should process the incoming frame for autofocus, if necessary.
 	     * Your autofocus (MyAutoFocus.h) has a function called update(...).
 	     */
-	    // TODO TODO TODO
-	    // TODO TODO TODO
-	    // TODO TODO TODO
-	    // TODO TODO TODO
-	    // TODO TODO TODO
+	    // Process the incoming frame. If autoFocus is enabled, the MyAutoFocus object will update the lens based on the last frame.
+	    if (currentShot->preview.autoFocus) {
+            LOG("!- AUTOFOCUS ON");
+		    LOG("!-    Focus: %f\n", lens.getFocus());
+
+		    autofocus.startSweep(); // will return immediately if already sweeping
+            autofocus.update(frame);
+            currentShot->preview.evaluated.focus = lens.getFocus();
+		    LOG("!-    Focus: %f\n", lens.getFocus());
+	    } else {
+	    	LOG("!- Manual focus");
+		    LOG("!-    Focus: %f\n", lens.getFocus());
+		    autofocus.cancelSweep();
+	    }
+
 
 	    // Update histogram data
 	    const FCam::Histogram &histogram = frame.histogram();
