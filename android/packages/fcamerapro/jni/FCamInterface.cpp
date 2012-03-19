@@ -319,19 +319,22 @@ JNIEXPORT void JNICALL Java_com_nvidia_fcamerapro_FCamInterface_enqueueMessageFo
 	 * Enqueue a new message that represents a request for global autofocus.
 	 */
 	LOG("! enqueueMessageForAutofocus");
-	sAppData->requestQueue.produce(ParamSetRequest(PARAM_GLOBAL_AF, 0, sizeof(int)));
+	const int value = 0;
+	sAppData->requestQueue.produce(ParamSetRequest(PARAM_GLOBAL_AF, &value, sizeof(int)));}
 
-	// TODO TODO TODO
-	// TODO TODO TODO
-	// TODO TODO TODO
-	// TODO TODO TODO
-	// TODO TODO TODO
+JNIEXPORT void JNICALL Java_com_nvidia_fcamerapro_FCamInterface_enqueueMessageForFastAutofocus(JNIEnv *env, jobject thiz) {
+	LOG("! enqueueMessageForFastAutofocus");
+	const int value = 1;
+	sAppData->requestQueue.produce(ParamSetRequest(PARAM_GLOBAL_AF, &value, sizeof(int)));
 }
+
 
 JNIEXPORT void JNICALL Java_com_nvidia_fcamerapro_FCamInterface_enqueueMessageForAutofocusSpot(JNIEnv *env, jobject thiz, jfloat x, jfloat y) {
 	/* [CS478] Assignment #1
 	 * Enqueue a new message that represents a request for local autofocus
 	 */
+	LOG("! enqueueMessageForAutofocusSpot");
+
 	// TODO TODO TODO
 	// TODO TODO TODO
 	// TODO TODO TODO
@@ -562,6 +565,7 @@ static void *FCamAppThread(void *ptr) {
 				 * message types in ParamSetRequest.h.
 				 */
 				case PARAM_GLOBAL_AF:
+					autofocus.runFaster(taskData[0]!=0);
 				    autofocus.startSweep(); // will return immediately if already sweeping
 					break;
 				case PARAM_LOCAL_AF:

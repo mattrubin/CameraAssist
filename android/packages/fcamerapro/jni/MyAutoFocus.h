@@ -6,49 +6,66 @@
 #include <FCam/Base.h>
 #include <android/log.h>
 #include <time.h>
+#include <math.h>
+
 
 #define BIG_STEP_COUNT 10.0f
 #define SMALL_STEP_COUNT 50.0f
+#define FOCUS_TOLERANCE 0.005f
+
+#define FAST_BIG_STEP_COUNT 10.0f
+#define FAST_SMALL_STEP_COUNT 25.0f
+#define FAST_FOCUS_TOLERANCE 0.025f
+
+#define TEST_LOOP false
+#define SAMPLE_SIZE 50
 
 class MyAutoFocus : public FCam::Tegra::AutoFocus {
 public:
        MyAutoFocus(FCam::Tegra::Lens *l, FCam::Rect r = FCam::Rect()) : FCam::Tegra::AutoFocus(l,r) {
     	   lens = l;
     	   rect = r;
-    	   /* [CS478]
-    	    * Do any initialization you need.
-    	    */
+
     	   focusing = false;
+    	   speedBoost = false;
 
            nearFocus = lens->nearFocus();
            farFocus = lens->farFocus();
 
-           step = (nearFocus-farFocus)/BIG_STEP_COUNT;
-           fineStep = (nearFocus-farFocus)/SMALL_STEP_COUNT;
+           if(TEST_LOOP) runCount = 0;
        }
 
        void startSweep() {
     	   if (!lens) return;
-    	   /* [CS478]
-    	    * This method should initiate your autofocus algorithm.
-    	    * Before you do that, do basic checks, e.g. is the autofocus
-    	    * already engaged?
-    	    */
 
     	   // Only initialize if the AF sweep isn't already in progress
     	   if(focusing) return;
 
-    	   // Begin the sweep
-    	   LOG("AF: START");
+    	   // Set up the sweep
+    	   if(speedBoost){
+    		   step = (nearFocus-farFocus)/FAST_BIG_STEP_COUNT;
+    		   fineStep = (nearFocus-farFocus)/FAST_SMALL_STEP_COUNT;
+    	   } else {
+    		   step = (nearFocus-farFocus)/BIG_STEP_COUNT;
+    		   fineStep = (nearFocus-farFocus)/SMALL_STEP_COUNT;
+    	   }
+
     	   focusing = true;
     	   sweepNum = 0;
+
     	   targetFocus = farFocus;
+
     	   lastBestFocus = farFocus;
     	   lastBestContrast = 0;
     	   fineLowerBound = 0;
 
+    	   // Begin the sweep
+    	   if(speedBoost){
+        	   LOG("AF: START FAST");
+    	   } else {
+        	   LOG("AF: START");
+    	   }
     	   startTimer();
-
        }
 
        void cancelSweep() {
@@ -75,9 +92,9 @@ public:
     	   float lastFocus = t.focus;
 
     	   // If the frame was not taken at the target focus distance, (continue to) move the lens
-    	   if(lastFocus != targetFocus){
+    	   if(!equalFocus(lastFocus, targetFocus)){
         	   lens->setFocus(targetFocus);
-    		   LOG("AF: Moving: %.2f >> %.2f", lastFocus, targetFocus);
+    		   LOG("AF: Moving: %f >> %f", lastFocus, targetFocus);
     	   }
 
     	   // Otherwise, analyze the frame and move the focus one step closer
@@ -100,7 +117,7 @@ public:
     		   LOG("AF: Contrast: %.3f diopters: %u", lastFocus, contrast);
 
     		   // Compare this frame to the last one for contrast
-    		   if(contrast>lastBestContrast || lastFocus == farFocus+step){
+    		   if(contrast>lastBestContrast || equalFocus(lastFocus, farFocus+step)){
     			   // The contrast improved
         		   LOG("AF: Improvement %.3f + %.3f", lastBestFocus, lastFocus);
         		   // If this is the first sweep, update the lower boundary of the second sweep
@@ -130,10 +147,8 @@ public:
         		   } else if(sweepNum == 1){
         			   if(lastFocus <= fineLowerBound){
         				   // If the lens has reached the end of the sweep, stop
-        				   focusing = false;
-        				   LOG("AF: Failed");
-        				   endTimer();
-        				   LOG ("AF:");
+        				   finish();
+        				   return;
         			   } else {
         				   // Set the next target focus
         				   targetFocus = targetFocus-fineStep;
@@ -161,19 +176,80 @@ public:
     				   // set the lens to the best focus we could find
     	        	   lens->setFocus(lastBestFocus);
     	        	   // Stop autofocusing
-    				   focusing = false;
-    				   LOG("AF: Complete");
-
-    				   endTimer();
-    				   LOG ("AF:");
-
-    				   return;
+    	        	   finish();
+    	        	   return;
     			   }
     		   }
 
 
     	   }
        }
+
+
+
+
+
+
+
+
+
+       void runFaster(bool b = true){
+    	   speedBoost = b;
+       }
+
+private:
+       FCam::Tegra::Lens* lens;
+       FCam::Rect rect;
+
+       bool focusing; // Whether the autofocus is running
+       bool speedBoost; // Whether the faster (less precise) version is active
+
+
+       int sweepNum; // 0 is the first slow sweep, 1 is the second finer sweep
+       float targetFocus; // The next focus to check
+
+       float nearFocus; // The near (high) focus limit of the lens
+       float farFocus; // The far (low) focus limit of the lens
+
+       float step; // The step (in diopters) between frames on the first sweep
+       float fineStep; // The step (in diopters) between frames on the second sweep
+
+       float lastBestFocus; // The focus of the frame with the best contrast so far
+       float lastBestContrast; // The contrast measurement of the frame with the best contrast so far
+       float fineLowerBound; // The focus of the frame just before the best one so far; used as the far boundary of the second sweep
+
+       double startTime; // The starting time in seconds, used for measuring the speed
+       int runCount; // how many times the autofocus has been run since initialization, used for running speed tests
+
+       void finish(){
+		   focusing = false;
+
+		   LOG("AF: Done: %f - %.6lf", lastBestFocus, elapsedTime());
+		   LOG("AF: COMPLETE");
+
+		   if(TEST_LOOP) runCount++;
+		   if(TEST_LOOP && runCount<SAMPLE_SIZE) startSweep();
+       }
+
+       uint calculateContrast(const FCam::Image &image){
+    	   if(!image.valid()) return -1;
+    	   uchar *src = (uchar *)image(0, 0);
+    	   uint contrast = 0;
+
+    	   uint height = image.height();
+    	   uint width = image.width();
+    	   for(uint row = 0; row<height; row++){
+    		   for(uint col = 0; col<width; col++){
+    			   if(col<width-1)
+    				   contrast += abs(src[row*width+col]-src[row*width+(col+1)]);
+    			   if(!speedBoost && row<height+1) // if speed boost is active, only measure the horizontal contrast
+    				   contrast += abs(src[row*width+col]-src[(row+1)*width+col]);
+    		   }
+    	   }
+
+    	   return contrast;
+       }
+
 
        void startTimer(){
            timeval tim;
@@ -187,7 +263,16 @@ public:
            LOG("AF: Time: %.6lf seconds elapsed\n", t2-startTime);
 
        }
+       double elapsedTime(){
+		   timeval tim;
+           gettimeofday(&tim, NULL);
+           return (tim.tv_sec+(tim.tv_usec/1000000.0))-startTime;
+       }
 
+
+       bool equalFocus(float a, float b){
+    	   return (fabs(a - b) < FOCUS_TOLERANCE);
+       }
 
        float nextFocus(){
     	   if(sweepNum == 0){
@@ -205,49 +290,6 @@ public:
 		   return targetFocus;
        }
 
-       uint calculateContrast(const FCam::Image &image){
-    	   if(!image.valid()) return -1;
-    	   uchar *src = (uchar *)image(0, 0);
-    	  // LOG("AF: %u x %u = %u  --> %u", image.width(), image.height(), image.width()*image.height(), (uint(image.width()*image.height()))*255);
-    	  // LOG("AF: %x, %x, %x, %x", src[0], src[1], src[2], src[3]);
-    	   uint contrast = 0;
-
-    	   uint height = image.height();
-    	   uint width = image.width();
-    	   for(uint row = 0; row<height; row++){
-    		   for(uint col = 0; col<width; col++){
-    			   if(col<width-1)
-    				   contrast += abs(src[row*width+col]-src[row*width+(col+1)]);
-    			   if(row<height+1)
-    				   contrast += abs(src[row*width+col]-src[(row+1)*width+col]);
-    		   }
-    	   }
-
-
-    	   return contrast;
-       }
-
-private:
-       FCam::Tegra::Lens* lens;
-       FCam::Rect rect;
-       /* [CS478]
-        * Declare any state variables you might need here.
-        */
-       bool focusing;
-       int sweepNum;
-       float targetFocus;
-
-       float nearFocus;
-       float farFocus;
-
-       float step;
-       float fineStep;
-
-       float lastBestFocus;
-       float lastBestContrast;
-       float fineLowerBound;
-
-       double startTime;
 };
 
 #endif

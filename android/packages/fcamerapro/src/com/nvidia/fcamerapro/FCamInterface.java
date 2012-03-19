@@ -209,6 +209,7 @@ public final class FCamInterface {
 	private native void getParamIntArray(int param, float[] value);
 	private native void getParamFloatArray(int param, float[] value);
 	public native void enqueueMessageForAutofocus();
+	public native void enqueueMessageForFastAutofocus();
 	public native void enqueueMessageForAutofocusSpot(float x, float y);	
 	/* [CS478] Assignment #2
 	 * Add a new declaration for a method that requests a photograph
