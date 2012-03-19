@@ -197,9 +197,10 @@ public:
     	   speedBoost = b;
        }
 
-       void setSpot(int x = -1, int y = -1){
+       void setSpot(float x = -1, float y = -1){
     	   spotX = x;
     	   spotY = y;
+    	   LOG("setSpot %f %f", spotX, spotY);
        }
 
 
@@ -227,8 +228,8 @@ private:
        double startTime; // The starting time in seconds, used for measuring the speed
        int runCount; // how many times the autofocus has been run since initialization, used for running speed tests
 
-       int spotX;
-       int spotY;
+       float spotX;
+       float spotY;
 
        void finish(){
 		   focusing = false;
@@ -248,24 +249,24 @@ private:
     	   uint width = image.width();
     	   uint height = image.height();
 
-		   uint startX = 0;
-		   uint endX = width;
-		   uint startY = 0;
-		   uint endY = height;
+		   int startX = 0;
+		   int endX = width;
+		   int startY = 0;
+		   int endY = height;
 
     	   if(spotX>=0){
-    		   startX = spotX-SPOT_RADIUS;
+    		   startX = spotX*width-SPOT_RADIUS;
     		   if(startX<0) startX = 0;
-    		   endX = spotX+SPOT_RADIUS;
+    		   endX = spotX*width+SPOT_RADIUS;
     		   if(endX>width) endX = width;
 
-    		   startY = spotY-SPOT_RADIUS;
+    		   startY = spotY*height-SPOT_RADIUS;
     		   if(startY<0) startY = 0;
-    		   endY = spotY+SPOT_RADIUS;
+    		   endY = spotY*height+SPOT_RADIUS;
     		   if(endY>height) endY = height;
     	   }
 
-    	   LOG("AF:PROCESS: Looking at px (%u-%u, %u-%u)   -   (%i, %i)", startX, endX, startY, endY, spotX, spotY);
+    	   LOG("AF:PROCESS: Looking at Spot px (%u-%u, %u-%u)   -   (%f, %f)", startX, endX, startY, endY, spotX, spotY);
     	   for(uint row = startY; row<endY; row++){
     		   for(uint col = startX; col<endX; col++){
     			   if(col<endX-1)
