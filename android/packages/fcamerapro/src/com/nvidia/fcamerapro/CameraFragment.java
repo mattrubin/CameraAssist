@@ -391,16 +391,9 @@ public final class CameraFragment extends Fragment implements OnClickListener, O
 				FCamInterface.GetInstance().enqueueMessageForFastAutofocus();
 				break;
 			case 2: // local
-				FCamInterface.GetInstance().enqueueMessageForAutofocusSpot(0, 0);
+				FCamInterface.GetInstance().enqueueMessageForAutofocusSpot(event.getX(), event.getY());
 				break;
 			}
-
-
-			// TODO TODO TODO
-			// TODO TODO TODO
-			// TODO TODO TODO
-			// TODO TODO TODO
-			// TODO TODO TODO
 			
 			/* [CS478] Assignment #2
 			 * You'll need to further modify the code you used here in Assignment 1

@@ -333,8 +333,9 @@ JNIEXPORT void JNICALL Java_com_nvidia_fcamerapro_FCamInterface_enqueueMessageFo
 	/* [CS478] Assignment #1
 	 * Enqueue a new message that represents a request for local autofocus
 	 */
-	LOG("! enqueueMessageForAutofocusSpot");
-
+	const int spot[2] = {int(x), int(y)};
+	LOG("! enqueueMessageForAutofocusSpot (%f, %f)", x, y);
+	sAppData->requestQueue.produce(ParamSetRequest(PARAM_LOCAL_AF, &spot, sizeof(int)*2));
 	// TODO TODO TODO
 	// TODO TODO TODO
 	// TODO TODO TODO
@@ -566,10 +567,13 @@ static void *FCamAppThread(void *ptr) {
 				 */
 				case PARAM_GLOBAL_AF:
 					autofocus.runFaster(taskData[0]!=0);
+					autofocus.setSpot(); //reset to global
 				    autofocus.startSweep(); // will return immediately if already sweeping
 					break;
 				case PARAM_LOCAL_AF:
 					// TODO: Set the parameters for local focus
+					autofocus.runFaster(false);
+					autofocus.setSpot(taskData[0], taskData[1]); //reset to global
 				    autofocus.startSweep();
 				    break;
 				// TODO TODO TODO

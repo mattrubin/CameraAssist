@@ -17,6 +17,8 @@
 #define FAST_SMALL_STEP_COUNT 25.0f
 #define FAST_FOCUS_TOLERANCE 0.025f
 
+#define SPOT_RADIUS 50
+
 #define TEST_LOOP false
 #define SAMPLE_SIZE 50
 
@@ -31,6 +33,9 @@ public:
 
            nearFocus = lens->nearFocus();
            farFocus = lens->farFocus();
+
+           spotX = -1;
+           spotY = -1;
 
            if(TEST_LOOP) runCount = 0;
        }
@@ -62,6 +67,8 @@ public:
     	   // Begin the sweep
     	   if(speedBoost){
         	   LOG("AF: START FAST");
+    	   } else if(spotX>=0) {
+        	   LOG("Autofocus: START %i, %i", spotX, spotY);
     	   } else {
         	   LOG("AF: START");
     	   }
@@ -186,16 +193,15 @@ public:
        }
 
 
-
-
-
-
-
-
-
        void runFaster(bool b = true){
     	   speedBoost = b;
        }
+
+       void setSpot(int x = -1, int y = -1){
+    	   spotX = x;
+    	   spotY = y;
+       }
+
 
 private:
        FCam::Tegra::Lens* lens;
@@ -221,6 +227,9 @@ private:
        double startTime; // The starting time in seconds, used for measuring the speed
        int runCount; // how many times the autofocus has been run since initialization, used for running speed tests
 
+       int spotX;
+       int spotY;
+
        void finish(){
 		   focusing = false;
 
@@ -236,13 +245,32 @@ private:
     	   uchar *src = (uchar *)image(0, 0);
     	   uint contrast = 0;
 
-    	   uint height = image.height();
     	   uint width = image.width();
-    	   for(uint row = 0; row<height; row++){
-    		   for(uint col = 0; col<width; col++){
-    			   if(col<width-1)
+    	   uint height = image.height();
+
+		   uint startX = 0;
+		   uint endX = width;
+		   uint startY = 0;
+		   uint endY = height;
+
+    	   if(spotX>=0){
+    		   startX = spotX-SPOT_RADIUS;
+    		   if(startX<0) startX = 0;
+    		   endX = spotX+SPOT_RADIUS;
+    		   if(endX>width) endX = width;
+
+    		   startY = spotY-SPOT_RADIUS;
+    		   if(startY<0) startY = 0;
+    		   endY = spotY+SPOT_RADIUS;
+    		   if(endY>height) endY = height;
+    	   }
+
+    	   LOG("AF:PROCESS: Looking at px (%u-%u, %u-%u)   -   (%i, %i)", startX, endX, startY, endY, spotX, spotY);
+    	   for(uint row = startY; row<endY; row++){
+    		   for(uint col = startX; col<endX; col++){
+    			   if(col<endX-1)
     				   contrast += abs(src[row*width+col]-src[row*width+(col+1)]);
-    			   if(!speedBoost && row<height+1) // if speed boost is active, only measure the horizontal contrast
+    			   if(!speedBoost && row<endY+1) // if speed boost is active, only measure the horizontal contrast
     				   contrast += abs(src[row*width+col]-src[(row+1)*width+col]);
     		   }
     	   }
