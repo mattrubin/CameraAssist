@@ -46,11 +46,8 @@
  * to the switch-case statement, in order to define new types of
  * messages, if needed.
  */
-// TODO TODO TODO
-// TODO TODO TODO
-// TODO TODO TODO
-// TODO TODO TODO
-// TODO TODO TODO
+#define PARAM_GLOBAL_AF                18
+#define PARAM_LOCAL_AF                 19
 
 /* [CS478]
  * It might be necessary to add another message type to handle

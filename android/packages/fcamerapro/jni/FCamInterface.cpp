@@ -318,6 +318,9 @@ JNIEXPORT void JNICALL Java_com_nvidia_fcamerapro_FCamInterface_enqueueMessageFo
 	/* [CS478] Assignment #1
 	 * Enqueue a new message that represents a request for global autofocus.
 	 */
+	LOG("! enqueueMessageForAutofocus");
+	sAppData->requestQueue.produce(ParamSetRequest(PARAM_GLOBAL_AF, 0, sizeof(int)));
+
 	// TODO TODO TODO
 	// TODO TODO TODO
 	// TODO TODO TODO
@@ -558,6 +561,13 @@ static void *FCamAppThread(void *ptr) {
 				 * that request autofocus to be activated. Define any new
 				 * message types in ParamSetRequest.h.
 				 */
+				case PARAM_GLOBAL_AF:
+				    autofocus.startSweep(); // will return immediately if already sweeping
+					break;
+				case PARAM_LOCAL_AF:
+					// TODO: Set the parameters for local focus
+				    autofocus.startSweep();
+				    break;
 				// TODO TODO TODO
 				// TODO TODO TODO
 				// TODO TODO TODO
@@ -659,16 +669,14 @@ static void *FCamAppThread(void *ptr) {
 	     */
 	    // Process the incoming frame. If autoFocus is enabled, the MyAutoFocus object will update the lens based on the last frame.
 	    if (currentShot->preview.autoFocus) {
-            LOG("!- AUTOFOCUS ON");
-		    LOG("!-    Focus: %f\n", lens.getFocus());
+	    	// Update the UI slider with the current focus value
+     	    FCam::Lens::Tags::Tags t = FCam::Lens::Tags::Tags(frame);
+     	    float lastFocus = t.focus;
+            currentShot->preview.evaluated.focus =  lastFocus;
 
-		    autofocus.startSweep(); // will return immediately if already sweeping
+            // Update the autofocus sweep with the current frame's data
             autofocus.update(frame);
-            currentShot->preview.evaluated.focus = lens.getFocus();
-		    LOG("!-    Focus: %f\n", lens.getFocus());
 	    } else {
-	    	LOG("!- Manual focus");
-		    LOG("!-    Focus: %f\n", lens.getFocus());
 		    autofocus.cancelSweep();
 	    }
 
