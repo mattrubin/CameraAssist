@@ -108,10 +108,26 @@
 				android:layout_marginRight="@dimen/big_margin" />
 		</LinearLayout>
 
-		<!-- IMAGE OUTPUT FORMAT -->
+		<!-- VIEWFINDER MODE -->
 		<LinearLayout android:orientation="horizontal"
 			android:layout_width="match_parent" android:layout_height="wrap_content"
 			android:layout_marginTop="@dimen/very_big_margin">
+
+			<RelativeLayout android:layout_width="@dimen/spinner_elem_label_max_width"
+				android:layout_height="match_parent">
+				<TextView style="@style/elem_labels" android:text="@string/label_viewfinder_mode" />
+			</RelativeLayout>
+
+			<Spinner android:id="@+id/spinner_viewfinder_mode"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:prompt="@string/label_viewfinder_mode"
+				android:layout_marginRight="@dimen/big_margin" />
+		</LinearLayout>
+		
+		<!-- IMAGE OUTPUT FORMAT -->
+		<LinearLayout android:orientation="horizontal"
+			android:layout_width="match_parent" android:layout_height="wrap_content"
+			android:layout_marginTop="@dimen/small_margin">
 
 			<RelativeLayout android:layout_width="@dimen/spinner_elem_label_max_width"
 				android:layout_height="match_parent">

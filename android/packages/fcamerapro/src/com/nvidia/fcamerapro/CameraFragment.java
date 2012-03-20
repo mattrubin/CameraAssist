@@ -39,9 +39,7 @@ public final class CameraFragment extends Fragment implements OnClickListener, O
 	/* [CS478] Assignment #2
 	 * Create an additional spinner reference to keep track of the viewfinder mode. 
 	 */
-	// TODO TODO TODO
-	// TODO TODO TODO
-	// TODO TODO TODO
+	private Spinner mViewfinderModeSpinner;
 	
 	private Button mCaptureButton;
 	private HistogramView mHistogramView;
@@ -92,10 +90,13 @@ public final class CameraFragment extends Fragment implements OnClickListener, O
 		/* [CS478] Assignment #2
 		 * This piece of code should unpack the viewfinder mode spinner.
 		 * Don't forget to set its onItemSelectedListener appropriately.
-		 */		
-		// TODO TODO TODO
-		// TODO TODO TODO	
-		// TODO TODO TODO
+		 */
+		// Unpack the spinner for the viewfinder mode.
+		mViewfinderModeSpinner = (Spinner) mContentView.findViewById(R.id.spinner_viewfinder_mode);
+		adapter = ArrayAdapter.createFromResource(activity, R.array.viewfinder_mode_array, android.R.layout.simple_spinner_item);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		mViewfinderModeSpinner.setAdapter(adapter);
+		mViewfinderModeSpinner.setOnItemSelectedListener(this);
 		
 		// Set the checkboxes for 3A algorithms.
 		mAutoExposureCheckBox = (CheckBox) mContentView.findViewById(R.id.cb_auto_exposure);
@@ -192,6 +193,7 @@ public final class CameraFragment extends Fragment implements OnClickListener, O
 		 * should add some code here to update the CameraView to use the correct
 		 * viewfinder mode.
     	 */
+    	System.out.println("Viewfinder mode changed!!");
     	// TODO TODO TODO 
     	// TODO TODO TODO 
     	// TODO TODO TODO 

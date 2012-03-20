@@ -36,6 +36,11 @@
 	<string name="label_info_image">Image Name\nExposure\nGain\nWB\nFlash\n</string>
 	
 	<string name="label_preview_hint">Long press images to enlarge...</string>
+	<string-array name="viewfinder_mode_array">
+		<item >Standard</item>
+		<item >Zebra</item>
+	</string-array>
+	<string name="label_viewfinder_mode">Viewfinder Mode</string>
 	
 	
 	
