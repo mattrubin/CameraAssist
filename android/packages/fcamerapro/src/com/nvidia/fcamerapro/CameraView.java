@@ -109,12 +109,7 @@ final class CameraViewRenderer implements GLSurfaceView.Renderer, FCamInterfaceE
 		/*  [CS478] Assignment #2
 		 *  You'll need to modify the size of the shader program array to fit your new zebra viewfinder mode.
 		 */
-		// TODO TODO TODO 
-		// TODO TODO TODO 
-		// TODO TODO TODO 
-		// TODO TODO TODO 
-		
-		mShaderProgram = new int[2];
+		mShaderProgram = new int[mContext.getResources().getStringArray(R.array.viewfinder_mode_array).length];
 	}
 
 	
@@ -230,10 +225,7 @@ final class CameraViewRenderer implements GLSurfaceView.Renderer, FCamInterfaceE
 		 *  you to get control of the OpenGL thread again, which can be 
 		 *  tricky.
 		 */
-		// TODO TODO TODO 
-		// TODO TODO TODO 
-		// TODO TODO TODO 
-		// TODO TODO TODO 
+		mShaderProgram[1] = loadShaderProgram("zebra");
 		
 		GLES20.glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
 	}

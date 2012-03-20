@@ -194,10 +194,7 @@ public final class CameraFragment extends Fragment implements OnClickListener, O
 		 * viewfinder mode.
     	 */
     	System.out.println("Viewfinder mode changed!!");
-    	// TODO TODO TODO 
-    	// TODO TODO TODO 
-    	// TODO TODO TODO 
-    	// TODO TODO TODO 
+    	mCameraView.setShaderProgramIndex(pos);
     }
 
     public void onNothingSelected(AdapterView<?> parent) {
