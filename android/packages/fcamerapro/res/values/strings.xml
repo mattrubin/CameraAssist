@@ -40,6 +40,7 @@
 		<item >Standard</item>
 		<item >Zebra</item>
 		<item >Box Focus</item>
+		<item >Gaussian Focus</item>
 	</string-array>
 	<string name="label_viewfinder_mode">Viewfinder Mode</string>
 	
