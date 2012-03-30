@@ -228,6 +228,10 @@ final class CameraViewRenderer implements GLSurfaceView.Renderer, FCamInterfaceE
 		mShaderProgram[1] = loadShaderProgram("zebra");
 		mShaderProgram[2] = loadShaderProgram("boxfocus");
 		mShaderProgram[3] = loadShaderProgram("gaussianfocus");
+		mShaderProgram[4] = loadShaderProgram("boxblur");
+		mShaderProgram[5] = loadShaderProgram("gaussianblur");
+		mShaderProgram[6] = loadShaderProgram("selectiveblur");
+		mShaderProgram[7] = loadShaderProgram("sharpnessguage");
 		
 		GLES20.glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
 	}
