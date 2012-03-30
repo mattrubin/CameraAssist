@@ -38,12 +38,6 @@
 	<string name="label_preview_hint">Long press images to enlarge...</string>
 	<string-array name="viewfinder_mode_array">
 		<item >Standard</item>
-		<item >Zebra</item>
-		<item >Box Focus</item>
-		<item >Gaussian Focus</item>
-		<item >Box Blur</item>
-		<item >Gaussian Blur</item>
-		<item >Selective Blur</item>
 		<item >Sharpness</item>
 		
  	</string-array>
