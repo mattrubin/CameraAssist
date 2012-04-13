@@ -21,13 +21,18 @@
 						<toolChain id="org.eclipse.cdt.build.core.prefbase.toolchain.1367894069" name="No ToolChain" resourceTypeBasedDiscovery="false" superClass="org.eclipse.cdt.build.core.prefbase.toolchain">
 							<targetPlatform id="org.eclipse.cdt.build.core.prefbase.toolchain.1367894069.926410228" name=""/>
 							<builder arguments="${NDKROOT}/ndk-build NDK_DEBUG=1" buildPath="${workspace_loc:/ImageProcessing/jni}" command="bash" id="org.eclipse.cdt.build.core.settings.default.builder.1802584042" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="org.eclipse.cdt.build.core.settings.default.builder"/>
-							<tool id="org.eclipse.cdt.build.core.settings.holder.libs.1442115925" name="holder for library settings" superClass="org.eclipse.cdt.build.core.settings.holder.libs"/>
+							<tool id="org.eclipse.cdt.build.core.settings.holder.libs.1442115925" name="holder for library settings" superClass="org.eclipse.cdt.build.core.settings.holder.libs">
+								<option id="org.eclipse.cdt.build.core.settings.holder.libpaths.2010852267" name="Library Paths" superClass="org.eclipse.cdt.build.core.settings.holder.libpaths"/>
+							</tool>
 							<tool id="org.eclipse.cdt.build.core.settings.holder.541209861" name="Assembly" superClass="org.eclipse.cdt.build.core.settings.holder">
 								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.1591053467" languageId="org.eclipse.cdt.core.assembly" languageName="Assembly" sourceContentType="org.eclipse.cdt.core.asmSource" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
 							</tool>
 							<tool id="org.eclipse.cdt.build.core.settings.holder.636564284" name="GNU C++" superClass="org.eclipse.cdt.build.core.settings.holder">
 								<option id="org.eclipse.cdt.build.core.settings.holder.incpaths.1234288275" name="Include Paths" superClass="org.eclipse.cdt.build.core.settings.holder.incpaths" valueType="includePath">
-									<listOptionValue builtIn="false" value="/Users/matt/NVPACK/android-ndk-r7/platforms/android-14/arch-arm/usr/include"/>
+									<listOptionValue builtIn="false" value="/Users/cs478/NVPACK/android-ndk-r7/platforms/android-14/arch-arm/usr/include"/>
+									<listOptionValue builtIn="false" value="/Users/cs478/ImageProcessing/fcam/include"/>
+									<listOptionValue builtIn="false" value="/Users/cs478/NVPACK/android-ndk-r7/sources/cxx-stl/gnu-libstdc++/include"/>
+									<listOptionValue builtIn="false" value="/Users/cs478/NVPACK/android-ndk-r7/sources/cxx-stl/stlport/stlport"/>
 								</option>
 								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.1317672569" languageId="org.eclipse.cdt.core.g++" languageName="GNU C++" sourceContentType="org.eclipse.cdt.core.cxxSource,org.eclipse.cdt.core.cxxHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
 							</tool>

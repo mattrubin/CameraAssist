@@ -1,10 +1,10 @@
-#Sun Mar 18 19:26:11 PDT 2012
+#Fri Apr 13 02:07:29 PDT 2012
 eclipse.preferences.version=1
 environment/project/0.1148883931/NDKROOT/delimiter=\:
-environment/project/0.1148883931/NDKROOT/operation=append
-environment/project/0.1148883931/NDKROOT/value=/Users/matt/NVPACK/android-ndk-r7
+environment/project/0.1148883931/NDKROOT/operation=replace
+environment/project/0.1148883931/NDKROOT/value=/Users/cs478/NVPACK/android-ndk-r7
 environment/project/0.1148883931/NDK_MODULE_PATH/delimiter=\:
 environment/project/0.1148883931/NDK_MODULE_PATH/operation=replace
-environment/project/0.1148883931/NDK_MODULE_PATH/value=/Users/matt/ImageProcessing
+environment/project/0.1148883931/NDK_MODULE_PATH/value=/Users/cs478/ImageProcessing
 environment/project/0.1148883931/append=true
 environment/project/0.1148883931/appendContributed=true

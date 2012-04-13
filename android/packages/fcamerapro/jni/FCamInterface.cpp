@@ -15,6 +15,9 @@
 #include "HPT.h"
 
 #include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+
+#include <cmath>
 
 #define PREVIEW_IMAGE_WIDTH  640
 #define PREVIEW_IMAGE_HEIGHT 480
@@ -634,6 +637,7 @@ static void *FCamAppThread(void *ptr) {
 	    }
 
 	    if (false) {
+
 	    	std::vector<cv::Rect> facesFound = faceDetector.detectFace(frame.image());
 	    	for (unsigned int i = 0; i < facesFound.size(); i++) {
 	    		cv::Rect r = facesFound[i];
@@ -646,6 +650,7 @@ static void *FCamAppThread(void *ptr) {
 					frame.image()(r.x + r.width, r.y + y)[0] = 254u;
 	    		}
 	    	}
+
 	    }
 	    /* [CS478] Assignment #2
 	     * Above, facesFound contains the list of detected faces, for the given frame.
@@ -699,15 +704,80 @@ static void *FCamAppThread(void *ptr) {
 	    	currentShot->histogramData[i * 4 + 3] = 0.0f;
 	    }
 
+
+		// TODO: Edge Detection
+
+
+	    const FCam::Image image = frame.image();
+/*	    cv::Mat imgsrc = cvCreateImage(cvSize(PREVIEW_IMAGE_WIDTH, PREVIEW_IMAGE_HEIGHT), 8, 1);
+	    memcpy(imgsrc.data, (uchar *)frame.image()(0, 0), PI_PLANE_SIZE);
+
+	    cv::Mat dst, cdst;
+	    cv::Canny(imgsrc, dst, 50, 200, 3);
+	    LOG("CV: 1");
+	    cv::cvtColor(dst, cdst, CV_GRAY2BGR);
+
+		std::vector<cv::Vec4i> lines;
+		cv::HoughLinesP(dst, lines, 1, CV_PI/180, 50, 50, 10 );
+		for( size_t i = 0; i < lines.size(); i++ )
+		{
+			cv::Vec4i l = lines[i];
+
+			int lineThickness = 1;
+
+			float closeThreshold = 0.1;
+			cv::Scalar closeColor = cv::Scalar(0);
+			float greatThreshold = 0.02;
+			cv::Scalar greatColor = cv::Scalar(255);
+
+
+			if(atan2(abs(l[3]-l[1]), abs(l[2]-l[0])) < closeThreshold) {
+				// If the line is close to horizontal...
+				if(atan2(abs(l[3]-l[1]), abs(l[2]-l[0])) < greatThreshold) {
+					// If the line is truly horizontal, we don't need to draw anything...
+					//cv::line( imgsrc, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), greatColor, lineThickness, CV_AA);
+				} else {
+					// Otherwise if the line is not quite horizontal, we draw the line and a
+					cv::line( imgsrc, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), closeColor, lineThickness, CV_AA);
+					if(abs(l[0]-PREVIEW_IMAGE_WIDTH/2) < abs(l[2]-PREVIEW_IMAGE_WIDTH/2))
+						cv::line( imgsrc, cv::Point(l[0], l[1]), cv::Point(l[2], l[1]), closeColor, lineThickness, CV_AA);
+					else
+						cv::line( imgsrc, cv::Point(l[0], l[3]), cv::Point(l[2], l[3]), closeColor, lineThickness, CV_AA);
+				}
+			} else if(atan2(abs(l[2]-l[0]), abs(l[3]-l[1])) < closeThreshold) {
+				// If the line is close to vertical...
+				if(atan2(abs(l[2]-l[0]), abs(l[3]-l[1])) < greatThreshold) {
+					//cv::line( imgsrc, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), greatColor, lineThickness, CV_AA);
+
+				} else {
+					cv::line( imgsrc, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), closeColor, lineThickness, CV_AA);
+					if(abs(l[1]-PREVIEW_IMAGE_HEIGHT/2) < abs(l[3]-PREVIEW_IMAGE_HEIGHT/2))
+						cv::line( imgsrc, cv::Point(l[0], l[1]), cv::Point(l[0], l[3]), closeColor, lineThickness, CV_AA);
+					else
+						cv::line( imgsrc, cv::Point(l[2], l[1]), cv::Point(l[2], l[3]), closeColor, lineThickness, CV_AA);
+				}
+
+			}
+
+
+
+		}
+
+	    //cv::cvtColor(cdst, dst, CV_BGR2GRAY);
+	    memcpy((uchar *)image(0, 0), imgsrc.data, PI_PLANE_SIZE);
+
+*/
+
+
 	    // Update the frame buffer.
-	    uchar *src = (uchar *)frame.image()(0, 0);
+	    uchar *src = (uchar *)image(0, 0);
 	    FCam::Tegra::Hal::SharedBuffer *captureBuffer = tdata->tripleBuffer->getBackBuffer();
 	    uchar *dest = (uchar *)captureBuffer->lock();
 
 	    // Note: why do we need to shuffle U and V channels? It seems to be a bug.
 	    memcpy(dest, src, PI_PLANE_SIZE);
-	    memcpy(dest + PI_U_OFFSET, src + PI_V_OFFSET, PI_PLANE_SIZE >> 2);
-	    memcpy(dest + PI_V_OFFSET, src + PI_U_OFFSET, PI_PLANE_SIZE >> 2);
+	    memcpy(dest + PI_U_OFFSET, (uchar *)image(0, 0) + PI_V_OFFSET, PI_PLANE_SIZE >> 2);
+	    memcpy(dest + PI_V_OFFSET, (uchar *)image(0, 0) + PI_U_OFFSET, PI_PLANE_SIZE >> 2);
 	    captureBuffer->unlock();
 	    tdata->tripleBuffer->swapBackBuffer();
 
