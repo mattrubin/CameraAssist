@@ -225,7 +225,9 @@ final class CameraViewRenderer implements GLSurfaceView.Renderer, FCamInterfaceE
 		 *  you to get control of the OpenGL thread again, which can be 
 		 *  tricky.
 		 */
-		mShaderProgram[1] = loadShaderProgram("sharpnessguage");
+		mShaderProgram[1] = loadShaderProgram("default"); // used for alignment view
+		mShaderProgram[2] = loadShaderProgram("sharpnessguage");
+
 		
 		GLES20.glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
 	}

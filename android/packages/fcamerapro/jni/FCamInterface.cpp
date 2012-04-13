@@ -453,6 +453,8 @@ static void *FCamAppThread(void *ptr) {
     std::queue<ParamSetRequest> taskQueue;
 	ParamSetRequest task;
 
+//	bool alignmentAssist = false;
+
 	for (;;) {
 		FCAM_SHOT_PARAMS *currentShot = &tdata->currentShot;
 		FCAM_SHOT_PARAMS *previousShot = &tdata->previousShot;
@@ -589,6 +591,8 @@ static void *FCamAppThread(void *ptr) {
 				// TODO TODO TODO
 				// TODO TODO TODO
 				// TODO TODO TODO
+//				case PARAM_PREVIEW_ALIGNMENT_ASSIST_ON:
+//					alignmentAssist = taskData[0]!=0;
 			default:
 				ERROR("TaskDispatch(): received unsupported task id (%i)!", taskId);
 			}
@@ -709,13 +713,14 @@ static void *FCamAppThread(void *ptr) {
 
 
 	    const FCam::Image image = frame.image();
-/*	    cv::Mat imgsrc = cvCreateImage(cvSize(PREVIEW_IMAGE_WIDTH, PREVIEW_IMAGE_HEIGHT), 8, 1);
+//	    if(alignmentAssist){
+	    cv::Mat imgsrc = cvCreateImage(cvSize(PREVIEW_IMAGE_WIDTH, PREVIEW_IMAGE_HEIGHT), 8, 1);
 	    memcpy(imgsrc.data, (uchar *)frame.image()(0, 0), PI_PLANE_SIZE);
 
 	    cv::Mat dst, cdst;
 	    cv::Canny(imgsrc, dst, 50, 200, 3);
 	    LOG("CV: 1");
-	    cv::cvtColor(dst, cdst, CV_GRAY2BGR);
+	    //cv::cvtColor(dst, cdst, CV_GRAY2BGR);
 
 		std::vector<cv::Vec4i> lines;
 		cv::HoughLinesP(dst, lines, 1, CV_PI/180, 50, 50, 10 );
@@ -766,7 +771,7 @@ static void *FCamAppThread(void *ptr) {
 	    //cv::cvtColor(cdst, dst, CV_BGR2GRAY);
 	    memcpy((uchar *)image(0, 0), imgsrc.data, PI_PLANE_SIZE);
 
-*/
+//	    }
 
 
 	    // Update the frame buffer.
