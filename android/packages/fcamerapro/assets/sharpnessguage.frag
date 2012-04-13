@@ -17,7 +17,7 @@ void main() {
 	float squareSum = 0.0;
 
 
-	int radius = 1;
+	int radius = 2;
 
 	int dy = 0;
 	int dx = -radius;
@@ -37,10 +37,12 @@ void main() {
 		// get the color for this pixel
 		coordinates = vec2(vTexCoordOut.x+float(dx)*deltaX, vTexCoordOut.y+float(dy)*deltaY);
 		vec4 nextColor = texture2D(texture, coordinates);
+		// If it's the true pixel color, save it
 		if(dx==0 && dy==0) trueColor = nextColor;
 		
 		// Compare to the previous pixel
 		vec4 colorDiff = nextColor-prevColor;
+		// convert the RGB to Y
 		float luminanceDiff = 0.299*colorDiff.r + 0.587*colorDiff.g + 0.144*colorDiff.b;
 		
 		// Add to the sums
@@ -57,7 +59,7 @@ void main() {
 	sumColor /= float(sumWeight);
 	
 	float sumSquared = pow(sum, 2.0);
-	float sharpness = squareSum/(0.1);
+	float sharpness = sumSquared/squareSum;
 	
-	gl_FragColor = (sumColor-trueColor)*2.5;
+	gl_FragColor = vec4(squareSum*2.5);
 }
