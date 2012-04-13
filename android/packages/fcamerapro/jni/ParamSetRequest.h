@@ -48,7 +48,7 @@
  */
 #define PARAM_GLOBAL_AF                18
 #define PARAM_LOCAL_AF                 19
-//#define PARAM_PREVIEW_ALIGNMENT_ASSIST_ON   20
+#define PARAM_PREVIEW_ALIGNMENT_ASSIST_ON   20
 
 /* [CS478]
  * It might be necessary to add another message type to handle

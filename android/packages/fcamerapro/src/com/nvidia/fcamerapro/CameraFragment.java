@@ -195,8 +195,8 @@ public final class CameraFragment extends Fragment implements OnClickListener, O
     	 */
     	System.out.println("Viewfinder mode changed!!");
     	mCameraView.setShaderProgramIndex(pos);
-//		FCamInterface iface = FCamInterface.GetInstance();
-//		iface.enableAlignmentAssist(pos==1);
+		FCamInterface iface = FCamInterface.GetInstance();
+		iface.enableAlignmentAssist(pos==1);
     }
 
     public void onNothingSelected(AdapterView<?> parent) {

@@ -40,7 +40,7 @@ public final class FCamInterface {
 	final static private int PARAM_PREVIEW_AUTO_WB_ON = 15;
 	final static private int PARAM_CAPTURE_FPS = 16;
 	final static private int PARAM_TAKE_PICTURE = 17;
-//	final static private int PARAM_PREVIEW_ALIGNMENT_ASSIST_ON = 20;
+	final static private int PARAM_PREVIEW_ALIGNMENT_ASSIST_ON = 20;
 	
 	final static private int SHOT_PARAM_EXPOSURE = 0;
 	final static private int SHOT_PARAM_FOCUS = 1;
@@ -122,10 +122,10 @@ public final class FCamInterface {
 	}
 	
 	// Turn alignment assist on or off.
-//	public void enableAlignmentAssist(boolean value) {
-//		int pvalue = value ? 1 : 0;
-//		setParamInt(PARAM_PREVIEW_ALIGNMENT_ASSIST_ON, pvalue);
-//	}
+	public void enableAlignmentAssist(boolean value) {
+		int pvalue = value ? 1 : 0;
+		setParamInt(PARAM_PREVIEW_ALIGNMENT_ASSIST_ON, pvalue);
+	}
 
 	// Get a parameter for the viewfinder frame.
 	public int getPreviewParam(int shotParamId) {

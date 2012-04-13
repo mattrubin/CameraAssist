@@ -453,7 +453,7 @@ static void *FCamAppThread(void *ptr) {
     std::queue<ParamSetRequest> taskQueue;
 	ParamSetRequest task;
 
-//	bool alignmentAssist = false;
+	bool alignmentAssist = false;
 
 	for (;;) {
 		FCAM_SHOT_PARAMS *currentShot = &tdata->currentShot;
@@ -591,8 +591,8 @@ static void *FCamAppThread(void *ptr) {
 				// TODO TODO TODO
 				// TODO TODO TODO
 				// TODO TODO TODO
-//				case PARAM_PREVIEW_ALIGNMENT_ASSIST_ON:
-//					alignmentAssist = taskData[0]!=0;
+				case PARAM_PREVIEW_ALIGNMENT_ASSIST_ON:
+					alignmentAssist = taskData[0]!=0;
 			default:
 				ERROR("TaskDispatch(): received unsupported task id (%i)!", taskId);
 			}
@@ -713,8 +713,10 @@ static void *FCamAppThread(void *ptr) {
 
 
 	    const FCam::Image image = frame.image();
-//	    if(alignmentAssist){
-	    cv::Mat imgsrc = cvCreateImage(cvSize(PREVIEW_IMAGE_WIDTH, PREVIEW_IMAGE_HEIGHT), 8, 1);
+	    cv::Mat imgsrc;
+
+	    if(alignmentAssist){
+	    imgsrc = cvCreateImage(cvSize(PREVIEW_IMAGE_WIDTH, PREVIEW_IMAGE_HEIGHT), 8, 1);
 	    memcpy(imgsrc.data, (uchar *)frame.image()(0, 0), PI_PLANE_SIZE);
 
 	    cv::Mat dst, cdst;
@@ -723,7 +725,7 @@ static void *FCamAppThread(void *ptr) {
 	    //cv::cvtColor(dst, cdst, CV_GRAY2BGR);
 
 		std::vector<cv::Vec4i> lines;
-		cv::HoughLinesP(dst, lines, 1, CV_PI/180, 50, 50, 10 );
+		cv::HoughLinesP(dst, lines, 1, CV_PI/180, 50, 75, 7 );
 		for( size_t i = 0; i < lines.size(); i++ )
 		{
 			cv::Vec4i l = lines[i];
@@ -744,10 +746,14 @@ static void *FCamAppThread(void *ptr) {
 				} else {
 					// Otherwise if the line is not quite horizontal, we draw the line and a
 					cv::line( imgsrc, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), closeColor, lineThickness, CV_AA);
-					if(abs(l[0]-PREVIEW_IMAGE_WIDTH/2) < abs(l[2]-PREVIEW_IMAGE_WIDTH/2))
+					cv::line( imgsrc, cv::Point(l[0], l[1]+1), cv::Point(l[2], l[3]+1), greatColor, lineThickness, CV_AA);
+					if(abs(l[0]-PREVIEW_IMAGE_WIDTH/2) < abs(l[2]-PREVIEW_IMAGE_WIDTH/2)){
+						cv::line( imgsrc, cv::Point(l[0], l[1]+1), cv::Point(l[2], l[1]+1), greatColor, lineThickness, CV_AA);
 						cv::line( imgsrc, cv::Point(l[0], l[1]), cv::Point(l[2], l[1]), closeColor, lineThickness, CV_AA);
-					else
+					} else {
+						cv::line( imgsrc, cv::Point(l[0], l[3]+1), cv::Point(l[2], l[3]+1), greatColor, lineThickness, CV_AA);
 						cv::line( imgsrc, cv::Point(l[0], l[3]), cv::Point(l[2], l[3]), closeColor, lineThickness, CV_AA);
+					}
 				}
 			} else if(atan2(abs(l[2]-l[0]), abs(l[3]-l[1])) < closeThreshold) {
 				// If the line is close to vertical...
@@ -756,10 +762,14 @@ static void *FCamAppThread(void *ptr) {
 
 				} else {
 					cv::line( imgsrc, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), closeColor, lineThickness, CV_AA);
-					if(abs(l[1]-PREVIEW_IMAGE_HEIGHT/2) < abs(l[3]-PREVIEW_IMAGE_HEIGHT/2))
+					cv::line( imgsrc, cv::Point(l[0]+1, l[1]), cv::Point(l[2]+1, l[3]), greatColor, lineThickness, CV_AA);
+					if(abs(l[1]-PREVIEW_IMAGE_HEIGHT/2) < abs(l[3]-PREVIEW_IMAGE_HEIGHT/2)) {
+						cv::line( imgsrc, cv::Point(l[0]+1, l[1]), cv::Point(l[0]+1, l[3]), greatColor, lineThickness, CV_AA);
 						cv::line( imgsrc, cv::Point(l[0], l[1]), cv::Point(l[0], l[3]), closeColor, lineThickness, CV_AA);
-					else
+					} else {
+						cv::line( imgsrc, cv::Point(l[2]+1, l[1]), cv::Point(l[2]+1, l[3]), greatColor, lineThickness, CV_AA);
 						cv::line( imgsrc, cv::Point(l[2], l[1]), cv::Point(l[2], l[3]), closeColor, lineThickness, CV_AA);
+					}
 				}
 
 			}
@@ -769,9 +779,9 @@ static void *FCamAppThread(void *ptr) {
 		}
 
 	    //cv::cvtColor(cdst, dst, CV_BGR2GRAY);
-	    memcpy((uchar *)image(0, 0), imgsrc.data, PI_PLANE_SIZE);
+	    //memcpy((uchar *)image(0, 0), imgsrc.data, PI_PLANE_SIZE);
 
-//	    }
+	    }
 
 
 	    // Update the frame buffer.
@@ -780,7 +790,8 @@ static void *FCamAppThread(void *ptr) {
 	    uchar *dest = (uchar *)captureBuffer->lock();
 
 	    // Note: why do we need to shuffle U and V channels? It seems to be a bug.
-	    memcpy(dest, src, PI_PLANE_SIZE);
+	    if(alignmentAssist) memcpy(dest, imgsrc.data, PI_PLANE_SIZE);
+	    else memcpy(dest, src, PI_PLANE_SIZE);
 	    memcpy(dest + PI_U_OFFSET, (uchar *)image(0, 0) + PI_V_OFFSET, PI_PLANE_SIZE >> 2);
 	    memcpy(dest + PI_V_OFFSET, (uchar *)image(0, 0) + PI_U_OFFSET, PI_PLANE_SIZE >> 2);
 	    captureBuffer->unlock();
