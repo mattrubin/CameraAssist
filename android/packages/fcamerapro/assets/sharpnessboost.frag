@@ -17,9 +17,9 @@ void main() {
 	float squareSum = 0.0;
 
 
-	int radius = 2;
+	int radius = 1;
 
-	int dy = 0;
+	int dy = -radius;
 	int dx = -radius;
 	
 	// get the color at (x-radius, y)
@@ -32,7 +32,8 @@ void main() {
 	vec4 trueColor;
 	
 	// iterate over the pixels from (x-radius+1, y) to (x+radius, y)
-	for(dx = -(radius-1); dx <= radius; dx++){
+	for(dx = -(radius); dx <= radius; dx++){
+	for(dy = -(radius); dy <= radius; dy++){
 		
 		// get the color for this pixel
 		coordinates = vec2(vTexCoordOut.x+float(dx)*deltaX, vTexCoordOut.y+float(dy)*deltaY);
@@ -55,11 +56,12 @@ void main() {
 		
 		prevColor = nextColor;
 	}
+	}
 	
 	sumColor /= float(sumWeight);
 	
 	float sumSquared = pow(sum, 2.0);
 	float sharpness = sumSquared/squareSum;
 	
-	gl_FragColor = trueColor+(sqrt(squareSum))*15.0*(trueColor-sumColor);
+	gl_FragColor = trueColor+(sqrt(squareSum)-0.25)*12.0*(trueColor-sumColor);
 }

@@ -61,5 +61,5 @@ void main() {
 	float sumSquared = pow(sum, 2.0);
 	float sharpness = sumSquared/squareSum;
 	
-	gl_FragColor = vec4(squareSum*2.5);
+	gl_FragColor = vec4((sqrt(squareSum)-0.15)*5.0);
 }
