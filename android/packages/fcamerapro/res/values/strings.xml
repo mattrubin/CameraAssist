@@ -38,7 +38,8 @@
 	<string name="label_preview_hint">Long press images to enlarge...</string>
 	<string-array name="viewfinder_mode_array">
 		<item >Standard</item>
-		<item>Alignment</item><item >Sharpness</item>
+		<item>Alignment</item><item >Sharpness Metric</item>
+		<item >Enhanced Sharpness</item>
 		
 		
  	</string-array>
